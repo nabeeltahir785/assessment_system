@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ]
     ],
 
     /*
@@ -111,5 +115,10 @@ return [
     */
 
     'password_timeout' => 10800,
+    'passport' => [
+        'token_expiry_days' => 15,
+        'refresh_token_expiry_days' => 30,
+        'personal_access_token_expiry_months' => 6,
+    ],
 
 ];
