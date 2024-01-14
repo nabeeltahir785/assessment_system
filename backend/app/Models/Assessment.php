@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Assessment extends Model
 {
     use HasFactory;
+
+    protected $fillable = ['title','description'];
+
+    public function sections()
+    {
+        return $this->belongsToMany(Section::class, 'assessment_section');
+    }
 }
