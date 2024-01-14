@@ -15,6 +15,7 @@ class UsersTableSeeder extends Seeder
     public function run(): void
     {
         $adminRole = Role::where('name', 'admin')->first();
+
         $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admin@metaschool.so',

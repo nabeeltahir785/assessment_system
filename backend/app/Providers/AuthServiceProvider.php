@@ -2,10 +2,9 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Laravel\Passport\Passport;
-
+use Illuminate\Support\Facades\Gate;
 class AuthServiceProvider extends ServiceProvider
 {
     /**
@@ -26,5 +25,9 @@ class AuthServiceProvider extends ServiceProvider
         Passport::tokensExpireIn(now()->addDays(config('auth.passport.token_expiry_days')));
         Passport::refreshTokensExpireIn(now()->addDays(config('auth.passport.refresh_token_expiry_days')));
         Passport::personalAccessTokensExpireIn(now()->addMonths(config('auth.passport.personal_access_token_expiry_months')));
+
+        Gate::define('create_assessment', function ($user) {
+            return $user->hasPermission('create_assessment');
+        });
     }
 }
