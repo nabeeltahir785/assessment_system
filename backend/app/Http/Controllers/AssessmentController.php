@@ -53,4 +53,38 @@ class AssessmentController extends Controller
             'type' => $questionData['type'],
         ]);
     }
+
+
+    public function getStudentAttemptCount($id)
+    {
+        $assessment = Assessment::find($id);
+
+        if (!$assessment) {
+            return response()->json(['message' => 'Assessment not found'], 404);
+        }
+
+        $attemptCount = $assessment->attempt_count;
+
+        return response()->json([
+            'assessment_id' => $id,
+            'attempt_count' => $attemptCount
+        ]);
+    }
+
+
+    public function getAllAssessmentAttemptCounts()
+    {
+        $assessments = Assessment::all();
+
+        $attemptCounts = [];
+
+        foreach ($assessments as $assessment) {
+            $attemptCounts[] = [
+                'assessment_id' => $assessment->id,
+                'attempt_count' => $assessment->attempt_count,
+            ];
+        }
+
+        return response()->json(['attempt_counts' => $attemptCounts]);
+    }
 }

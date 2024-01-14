@@ -12,4 +12,6 @@ Route::middleware('auth:api')->group(function() {
    Route::post('/user',[UserController::class,'currentUser'])->name("info");
    Route::resource('/section',SectionController::class);
    Route::post('/assessment',[AssessmentController::class,'createAssessmentWithSectionsAndQuestions']);
+    Route::get('/assessments/{id}/attempts',[AssessmentController::class,'getStudentAttemptCount']);
+    Route::get('/assessments/attempt-counts',[AssessmentController::class,'getAllAssessmentAttemptCounts']);
 });
