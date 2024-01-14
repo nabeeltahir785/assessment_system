@@ -8,7 +8,7 @@ use App\Models\Section;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class AssessmentsTable extends Seeder
+class AssessmentsSeeder extends Seeder
 {
     /**
      * Run the database seeds.

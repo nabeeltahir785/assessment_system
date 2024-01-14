@@ -9,4 +9,14 @@ class Section extends Model
 {
     use HasFactory;
     protected $fillable = ['title','description'];
+
+    public function assessments()
+    {
+        return $this->belongsToMany(Assessment::class, 'assessment_section');
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 }
