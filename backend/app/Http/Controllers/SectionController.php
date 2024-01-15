@@ -3,11 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Section;
+use App\Services\ApiResponse;
+use App\Services\SectionService;
+
 class SectionController extends Controller
 {
+    protected $sectionService;
+
+    public function __construct(SectionService $sectionService)
+    {
+        $this->sectionService = $sectionService;
+    }
+
     public function index()
     {
-        return $this->sendResponse(Section::all(), 'Sections retrieved successfully.');
+        return ApiResponse::success($this->sectionService->getAllSections());
     }
 
     /**
@@ -16,7 +26,7 @@ class SectionController extends Controller
     public function store(StoreSectionRequest $request)
     {
         $section = Section::create($request->validated());
-        return $this->sendResponse($section, 'Section created successfully.', 201);
+        return ApiResponse::created($section, 'Section created successfully.');
     }
 
     /**
@@ -24,7 +34,7 @@ class SectionController extends Controller
      */
     public function show(Section $section)
     {
-        return $this->sendResponse($section, 'Section retrieved successfully.');
+        return ApiResponse::success($section, 'Section created successfully.');
     }
 
     /**
@@ -33,7 +43,7 @@ class SectionController extends Controller
     public function update(StoreSectionRequest $request, Section $section)
     {
         $section->update($request->validated());
-        return $this->sendResponse($section, 'Section updated successfully.');
+        return ApiResponse::success($section, 'Section updated successfully.');
     }
 
     /**
@@ -42,17 +52,8 @@ class SectionController extends Controller
     public function destroy(Section $section)
     {
         $section->delete();
-        return $this->sendResponse([], 'Section deleted successfully.');
+        return ApiResponse::deleted($section, 'Section created successfully.');
     }
 
-    /**
-     * Send a JSON response.
-     */
-    protected function sendResponse($data, $message, $code = 200)
-    {
-        return response()->json([
-            'message' => $message,
-            'data' => $data
-        ], $code);
-    }
+
 }
