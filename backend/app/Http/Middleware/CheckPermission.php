@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\ApiResponse;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,6 @@ class CheckPermission
             return $next($request);
         }
 
-        return response()->json(['error' => 'Permission denied'], 403);
+        return ApiResponse::forbidden("Insufficient permissions");
     }
 }
