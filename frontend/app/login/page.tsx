@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'
+import {loginService} from "@/services/apiServices/loginService";
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -10,32 +11,41 @@ const LoginForm: React.FC = () => {
     const handleSubmit = async (event: React.FormEvent) => {
 
         event.preventDefault();
+        const response = await loginService({ email, password });
+        const token = response.data.token;
 
-        try {
-            const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-            const response = await fetch(`${baseUrl}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-
-            const data = await response.json();
-            const token = data.access_token;
-
-            if (token) {
-                localStorage.setItem('token', token);
-                router.push('/dashboard');
-            } else {
-                setErrorMessage('Login failed: No token received');
-            }
-        } catch (error) {
-            console.log(error)
+        if (token) {
+            localStorage.setItem('token', token);
+            router.push('/dashboard');
+        } else {
+            setErrorMessage('Login failed: No token received');
         }
+
+        // try {
+        //     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+        //     const response = await fetch(`${baseUrl}/login`, {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ email, password }),
+        //     });
+        //     if (!response.ok) {
+        //         throw new Error('Login failed');
+        //     }
+        //
+        //     const data = await response.json();
+        //     const token = data.access_token;
+        //
+        //     if (token) {
+        //         localStorage.setItem('token', token);
+        //         router.push('/dashboard');
+        //     } else {
+        //         setErrorMessage('Login failed: No token received');
+        //     }
+        // } catch (error) {
+        //     console.log(error)
+        // }
     };
 
     return (
