@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\ApiResponse;
 class AuthController extends Controller
 {
     private $auth;
@@ -25,7 +26,7 @@ class AuthController extends Controller
         $user = $this->auth->user();
         $tokenDetails = $this->createApiToken($user);
 
-        return $this->successResponse($tokenDetails);
+        return ApiResponse::loginSuccess($user,$tokenDetails['token']);
     }
 
     private function createApiToken($user)
@@ -39,18 +40,10 @@ class AuthController extends Controller
         ];
     }
 
-    private function successResponse(array $tokenDetails)
-    {
-
-        return response()->json(['token_type' => 'Bearer','access_token'=>$tokenDetails['token'],'expires_in'=>$tokenDetails['expiresIn']]);
-    }
 
 
     private function invalidCredentialsResponse()
     {
-        return response()->json([
-            'error' => 'invalid_credentials',
-            'message' => 'The user credentials were incorrect.'
-        ], 401);
+        return ApiResponse::unauthorized("Invalid Credentials");
     }
 }

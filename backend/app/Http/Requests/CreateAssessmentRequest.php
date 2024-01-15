@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Services\ApiResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -34,5 +35,11 @@ class CreateAssessmentRequest extends FormRequest
             'sections.*.questions.*.options.*.is_correct' => 'required|boolean',
             'sections.*.questions.*.type' => 'required|in:MCQ,MSQ',
         ];
+    }
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ApiResponse::validationError($validator->errors())
+        );
     }
 }

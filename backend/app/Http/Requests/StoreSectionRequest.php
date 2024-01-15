@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Services\ApiResponse;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+
 class StoreSectionRequest extends FormRequest
 {
     /**
@@ -25,5 +27,12 @@ class StoreSectionRequest extends FormRequest
             'title' => 'required|string',
             'description' => 'required|string',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            ApiResponse::validationError($validator->errors())
+        );
     }
 }
