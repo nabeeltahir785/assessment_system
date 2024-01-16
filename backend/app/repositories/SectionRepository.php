@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Repositories\SectionRepository;
+namespace App\Repositories;
 
 
-use App\Interfaces\SectionRepositoryInterface\SectionRepositoryInterface;
+use App\Interfaces\SectionRepositoryInterface;
 use App\Models\Section;
 
 class SectionRepository implements SectionRepositoryInterface
