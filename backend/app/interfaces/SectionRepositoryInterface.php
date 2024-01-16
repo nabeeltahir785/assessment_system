@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Interfaces\SectionRepositoryInterface;
+namespace App\Interfaces;
 
 use App\Models\Section;
 
