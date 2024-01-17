@@ -2,12 +2,11 @@ import React from "react";
 
 const Sidebar : React.FC = () => {
     return (
-        <aside className="bg-blue-200 w-64 p-4">
+        <aside className="col-span-2 bg-gray-300 p-4 min-h-screen">
             <nav>
                 <ul>
-                    <li>Sidebar Item 1</li>
-                    <li>Sidebar Item 2</li>
-                    <!-- Add more sidebar items here -->
+                    <li>Create Assessment</li>
+                    <li>Assessment Listing</li>
                 </ul>
             </nav>
         </aside>
