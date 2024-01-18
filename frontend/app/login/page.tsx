@@ -53,7 +53,7 @@ const LoginForm: React.FC = () => {
         <form onSubmit={handleSubmit}>
             <div className="mt-4">
                 <Input
-                    type="text"
+                    type="email"
                     value={email}
                     onChange={handleEmailChange}
                     placeholder="Email"

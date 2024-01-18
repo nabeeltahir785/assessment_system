@@ -1,6 +1,6 @@
 "use client"
-import React, { createContext, useReducer, ReactNode } from 'react';
-
+import React, { createContext, useReducer, ReactNode, Dispatch  } from 'react';
+//TODO: Export these interfaces to their respective directories
 export interface Option {
     option: string;
     is_correct: boolean;
@@ -11,6 +11,8 @@ export interface Question {
     name: string;
     type: 'MCQ' | 'MSQ';
     options: Option[];
+    answer?: string | string[];
+
 }
 
 export interface Section {
@@ -20,10 +22,19 @@ export interface Section {
 }
 
 export interface AssessmentState {
+    title : string;
+    description?: string;
     sections: Section[];
 }
 
+type AssessmentContextProps = {
+    state: AssessmentState;
+    dispatch: Dispatch<AssessmentAction>;
+};
+
 const initialState: AssessmentState = {
+    title: '',
+    description: '',
     sections: [
         {
             "id":1,
@@ -81,7 +92,7 @@ const initialState: AssessmentState = {
             "questions":[
                 {
                     "id":2,
-                    "name":"What is your age",
+                    "name":"Where are you",
                     "type":"MCQ",
                     "options":[
                         {
@@ -104,7 +115,7 @@ const initialState: AssessmentState = {
                 },
                 {
                     "id":1,
-                    "name":"What is your name",
+                    "name":"Food Panda",
                     "type":"MSQ",
                     "options":[
                         {
@@ -133,11 +144,10 @@ const initialState: AssessmentState = {
 type AssessmentAction =
     | { type: 'ADD_SECTION'; payload: Section }
     | { type: 'REMOVE_SECTION'; payload: { sectionId: number } }
+    | { type: 'UPDATE_ANSWER'; payload: { sectionId: number, questionId: number, answer: string | string[] } };
+// TODO: Split context providers into separate files Organize and split the context providers into individual files with each file representing a specific context or intent.
+export const AssessmentContext = createContext<AssessmentContextProps | undefined>(undefined);
 
-const AssessmentContext = createContext<{
-    state: AssessmentState;
-    dispatch: React.Dispatch<AssessmentAction>;
-}>({ state: initialState, dispatch: () => null });
 const assessmentReducer = (state: AssessmentState, action: AssessmentAction): AssessmentState => {
     switch (action.type) {
         case 'ADD_SECTION':
@@ -149,6 +159,29 @@ const assessmentReducer = (state: AssessmentState, action: AssessmentAction): As
             return {
                 ...state,
                 sections: state.sections.filter(section => section.id !== action.payload.sectionId),
+            };
+        case 'UPDATE_ANSWER':
+            const updatedSections = state.sections.map(section => {
+                if (section.id === action.payload.sectionId) {
+                    return {
+                        ...section,
+                        questions: section.questions.map(question => {
+                            if (question.id === action.payload.questionId) {
+                                return {
+                                    ...question,
+                                    answer: action.payload.answer
+                                };
+                            }
+                            return question;
+                        })
+                    };
+                }
+                return section;
+            });
+
+            return {
+                ...state,
+                sections: updatedSections
             };
         default:
             return state;
@@ -165,4 +198,10 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
     );
 };
 
-export const useAssessment = () => React.useContext(AssessmentContext);
+export const useAssessment = () => {
+    const context = React.useContext(AssessmentContext);
+    if (context === undefined) {
+        throw new Error('useAssessment must be used within an AssessmentProvider');
+    }
+    return context;
+};

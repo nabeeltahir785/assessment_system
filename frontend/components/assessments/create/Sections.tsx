@@ -1,17 +1,8 @@
-import React from 'react';
-import { useAssessment } from '@/context/AssessmentContext';
-import Section from './Section';
-
-const Sections: React.FC = () => {
-    const { state } = useAssessment();
-
+const CreateSection = () => {
     return (
-        <div>
-            {state.sections.map(section => (
-                <Section key={section.id} section={section} />
-            ))}
-        </div>
-    );
-};
+        <h1>Student Assessment</h1>
+    )
 
-export default Sections;
+}
+
+export default CreateSection;
