@@ -9,7 +9,7 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ headers, data }) => {
     return (
-        <table>
+        <table className="min-w-full">
             <TableHeader headers={headers}/>
             <TableBody headers={headers} data={data}/>
         </table>

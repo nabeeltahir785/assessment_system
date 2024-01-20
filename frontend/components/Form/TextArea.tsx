@@ -1,7 +1,8 @@
-import React, { ChangeEvent } from 'react';
-import { InputFieldProps } from "@/types/InputFieldType"
+import React from 'react';
+import { TextAreaFieldProps} from "@/types/InputFieldType"
 
-const Textarea: React.FC<InputFieldProps> = ({ value, onChange, placeholder, error }) => {
+const Textarea: React.FC<TextAreaFieldProps> = ({ value, onChange, placeholder, error }) => {
+
     return (
         <div className="mb-4">
             <label htmlFor="textarea" className="block text-gray-700">{placeholder}</label>

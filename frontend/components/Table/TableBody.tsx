@@ -10,7 +10,7 @@ const TableBody: React.FC<TableProps> = ({ headers, data }) => {
         {data.map((row, index) => (
             <tr key={index}>
                 {headers.map(header => (
-                    <td key={`${index}-${header}`}>{row[header]}</td>
+                    <td className="px-6 py-4 whitespace-nowrap" key={`${index}-${header}`}>{row[header]}</td>
                 ))}
             </tr>
         ))}

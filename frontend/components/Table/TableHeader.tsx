@@ -8,7 +8,7 @@ const TableHeader: React.FC<TableProps> = ({ headers}) => {
             <thead>
             <tr>
                 {headers.map(header => (
-                    <th key={header}>{header}</th>
+                    <th key={header} className="px-6 py-3 text-left">{header}</th>
                 ))}
             </tr>
             </thead>
