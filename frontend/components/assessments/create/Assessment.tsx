@@ -1,12 +1,12 @@
 "use client"
 import React from 'react';
 import { AssessmentProvider } from '@/context/AssessmentContext';
-import Sections from './Sections';
+import AssessmentForm from "@/components/assessments/create/AssessmentForm";
 
 const Assessment: React.FC = () => {
     return (
         <AssessmentProvider>
-            <Sections />
+            <AssessmentForm/>
         </AssessmentProvider>
     );
 };
