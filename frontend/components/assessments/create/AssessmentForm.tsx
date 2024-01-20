@@ -1,7 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import SectionForm from "@/components/assessments/create/SectionForm";
-import DropdownOptions from "@/components/assessments/create/DropdownOptions";
+"use client";
+import React, { useState} from 'react';
+import DropdownOptions, {IDropdownOption} from "@/components/assessments/create/DropdownOptions";
 import CreateQuestions from "@/components/assessments/create/CreateQuestions";
+import AssessmentTable from "@/components/assessments/create/AssessmentTable";
+import Input from "@/components/Form/Input";
+import Textarea from "@/components/Form/TextArea";
+import Dropdown from "@/components/Form/Dropdown";
 interface Option {
     option: string;
     isCorrect: boolean;
@@ -12,7 +16,7 @@ interface Question {
     name: string;
     type: 'MCQ' | 'MSQ';
     options: Option[];
-    answer?: string | string[]; // Depending on question type
+    answer?: string | string[];
 }
 
 interface Section {
@@ -33,29 +37,11 @@ const AssessmentForm: React.FC = () => {
         description: '',
         sections: []
     });
+    const [currentSectionId, setCurrentSectionId] = useState<IDropdownOption>(DropdownOptions[0]);
 
 
 
-    const [currentSectionId, setCurrentSectionId] = useState<number | null>(DropdownOptions[0]?.id || null);
 
-
-    const [questions, setQuestions] = useState<Question[]>([]);
-
-    useEffect(()=>{
-        console.log(assessment,"HERE ASSESSMENT",questions)
-    },[assessment,questions])
-    const addQuestion = (sectionId: number, question: Question) => {
-        setAssessment(prevAssessment => {
-            const updatedSections = prevAssessment.sections.map(section => {
-                if (section.id === sectionId) {
-                    return { ...section, questions: [...section.questions, question] };
-                }
-                return section;
-            });
-
-            return { ...prevAssessment, sections: updatedSections };
-        });
-    };
 
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +58,7 @@ const AssessmentForm: React.FC = () => {
     const handleSectionChange = (newSectionId) => {
         setCurrentSectionId(newSectionId);
     };
+
     const handleAddQuestion = (sectionId: number, newQuestion: Question) => {
         setAssessment((prevAssessment: Assessment) => {
             let sectionExists = false;
@@ -87,7 +74,6 @@ const AssessmentForm: React.FC = () => {
             });
 
             if (!sectionExists) {
-                // Create a new section with the new question
                 const newSection: Section = {
                     id: sectionId,
                     questions: [newQuestion]
@@ -102,62 +88,30 @@ const AssessmentForm: React.FC = () => {
     };
 
 
-    // const handleAddQuestion = (sectionId, newQuestion) => {
-    //     setQuestions(prevQuestions => [...prevQuestions, newQuestion]);
-    //     setAssessment(prevAssessment => {
-    //         const updatedSections = prevAssessment.sections.map(section => {
-    //             if (section.id === sectionId) {
-    //                 return { ...section, questions: [...section.questions, newQuestion] };
-    //             }
-    //             return section;
-    //         });
-    //
-    //         return { ...prevAssessment, sections: updatedSections };
-    //     });
-    // };
-    //
-    // const handleAddQuestion = (newQuestion: Question) => {
-    //     setQuestions(prevQuestions => [...prevQuestions, newQuestion]);
-    // };
-
 
 
     return (
         <form onSubmit={handleSubmit}>
-            <input type="text" value={assessment.title} onChange={handleTitleChange} placeholder="Assessment Title" />
-            <textarea value={assessment.description} onChange={handleDescriptionChange} placeholder="Description" />
-            <SectionForm
+            <Input type="text" value={assessment.title} onChange={handleTitleChange} placeholder="Assessment Title" />
+            <Textarea value={assessment.description} onChange={handleDescriptionChange}    placeholder="Description"/>
+            <Dropdown
                 dropdownOptions={DropdownOptions}
                 currentSectionId={currentSectionId}
                 onSectionChange={handleSectionChange}
-
             />
-            {
-                assessment.sections.map((section) => (
-                    section.questions.map((question, index) => (
-                        <div key={question.id}>
-                            <div>Question {index + 1}: {question.name}</div>
-                            <div>Type: {question.type}</div>
-                            <ul>
-                                {question.options.map((option, optionIndex) => (
-                                    <li key={optionIndex}>
-                                        Option: {option.option} {option.isCorrect ? "(Correct Answer)" : ""}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))
-                ))
-            }
-            {currentSectionId && (
-                <div key={DropdownOptions[currentSectionId].id}>
-                    <h3>Section: {DropdownOptions[currentSectionId].label}</h3>
+
+
+            <button
+                className="my-4 bg-rose text-white px-4 py-2 rounded hover:bg-[#ff2850] hover:shadow-lg transition duration-300">Submit
+            </button>
+            {currentSectionId &&  (
+                <div key={currentSectionId.id}>
+                    <h3>Section: {currentSectionId.label}</h3>
                     <CreateQuestions addQuestion={(question) => handleAddQuestion(DropdownOptions[currentSectionId].id, question)} />
                 </div>
             )}
 
-
-            <button type="submit">Submit</button>
+            <AssessmentTable assessment={assessment}/>
         </form>
     );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Input from "@/components/Form/Input";
 
 interface Option {
     option: string;
@@ -71,19 +72,19 @@ const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => 
 
     return (
         <div>
-            <input type="text" value={questionText} onChange={(e) => setQuestionText(e.target.value)} placeholder="Question Text" />
-            <select value={questionType} onChange={(e) => setQuestionType(e.target.value as 'MCQ' | 'MSQ')}>
+            <Input type="text" value={questionText} onChange={(e) => setQuestionText(e.target.value)} placeholder="Question Text"/>
+            <select className="form-select block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+                    value={questionType} onChange={(e) => setQuestionType(e.target.value as 'MCQ' | 'MSQ')}>
                 <option value="MCQ">MCQ</option>
                 <option value="MSQ">MSQ</option>
             </select>
             {options.map((option, index) => (
-                <div key={index}>
-                    <input
-                        type="text"
-                        value={option.option}
-                        onChange={(e) => updateOption(index, { ...option, option: e.target.value })}
-                        placeholder="Option Text"
-                    />
+                <div key={index} className="my-2">
+                    <Input  type="text"
+                            value={option.option}
+                            onChange={(e) => updateOption(index, { ...option, option: e.target.value })}
+                            placeholder="Option Text"/>
+
                     {questionType === 'MCQ' ? (
                         <input
                             type="radio"
@@ -100,7 +101,8 @@ const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => 
                     )}
                 </div>
             ))}
-            <button onClick={handleAddQuestion}>Add Question</button>
+            <button className="my-4 bg-rose text-white px-4 py-2 rounded hover:bg-[#ff2850] hover:shadow-lg transition duration-300"
+                onClick={handleAddQuestion}>Add Question</button>
         </div>
     );
 };
