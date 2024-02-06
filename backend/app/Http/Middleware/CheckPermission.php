@@ -2,11 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\ApiResponse;
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
+use ApiResponse;
 
 class CheckPermission
 {
@@ -20,7 +18,7 @@ class CheckPermission
      */
     public function handle($request, Closure $next)
     {
-        if ($request->route()->getPrefix() === 'api/admin/' && Auth::user()->hasPermission('create_assessment') ) {
+        if ($request->route()->getPrefix() === 'api/admin' && Auth::user()->hasPermission('create_assessment') ) {
             return $next($request);
         }
 
@@ -28,6 +26,6 @@ class CheckPermission
             return $next($request);
         }
 
-        return ApiResponse::forbidden("Insufficient permissions");
+        return ApiResponse::forbidden();
     }
 }

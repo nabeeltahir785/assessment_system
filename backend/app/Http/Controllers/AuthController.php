@@ -25,8 +25,11 @@ class AuthController extends Controller
 
         $user = $this->auth->user();
         $tokenDetails = $this->createApiToken($user);
+//        $cookie = cookie('token', $tokenDetails['token'], 60);
 
-        return ApiResponse::loginSuccess($user,$tokenDetails['token']);
+//        return ApiResponse::loginSuccess($user, $tokenDetails['token'])->withCookie($cookie);
+        return ApiResponse::loginSuccess($user, $tokenDetails['token']);
+
     }
 
     private function createApiToken($user)
