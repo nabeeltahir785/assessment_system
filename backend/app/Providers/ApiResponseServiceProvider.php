@@ -5,20 +5,20 @@ namespace App\Providers;
 use App\Services\ApiResponse;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class ApiResponseServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Register services.
      */
     public function register(): void
     {
-        //
-
-
+        $this->app->bind('ApiResponse', function ($app) {
+            return new ApiResponse();
+        });
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap services.
      */
     public function boot(): void
     {

@@ -21,16 +21,16 @@ class AssessmentsSeeder extends Seeder
         ]);
 
         $mathSection = Section::create([
-            'assessment_id' => $assessment->id,
             'title' => 'Mathematics',
             'description' => 'Mathematics section with multiple choice questions.',
         ]);
 
         $englishSection = Section::create([
-            'assessment_id' => $assessment->id,
             'title' => 'English',
             'description' => 'English section with multiple select questions.',
         ]);
+
+        $assessment->sections()->attach([$mathSection->id, $englishSection->id]);
 
         $mathQuestion = Question::create([
             'section_id' => $mathSection->id,

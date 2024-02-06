@@ -1,9 +1,15 @@
 <?php
 namespace App\Services;
 
-class ApiResponse
+
+use App\Contracts\ApiResponseInterface;
+use Illuminate\Http\JsonResponse;
+
+
+
+class ApiResponse implements ApiResponseInterface
 {
-    private static function jsonResponse($message, $data, $code)
+    private function jsonResponse($message, $data, $code) : JsonResponse
     {
         return response()->json([
             'status' => 'success',
@@ -11,16 +17,16 @@ class ApiResponse
             'data' => $data
         ], $code);
     }
-    public static function success($data = null, $message = "success", $code = 200)
+    public function success($data = null, $message = "success", $code = 200) : JsonResponse
     {
         return self::jsonResponse( $message, $data, $code);
     }
 
-    public static function created($data = null, $message = "success", $code = 201)
+    public function created($data = null, $message = "success", $code = 201) : JsonResponse
     {
         return self::jsonResponse( $message, $data, $code);
     }
-    public static function error($message = "An error occurred", $errors = [], $code = 400)
+    public function error($message = "An error occurred", $errors = [], $code = 400) : JsonResponse
     {
         return response()->json([
             'status' => 'error',
@@ -29,7 +35,7 @@ class ApiResponse
         ], $code);
     }
 
-    public static function loginSuccess($user, $token, $message = "Login successful")
+    public function loginSuccess($user, $token, $message = "Login successful") : JsonResponse
     {
         return response()->json([
             'status' => 'success',
@@ -41,7 +47,7 @@ class ApiResponse
         ], 200);
     }
 
-    public static function unauthorized($message = "Unauthorized access")
+    public function unauthorized($message = "Unauthorized access") : JsonResponse
     {
         return response()->json([
             'status' => 'error',
@@ -49,7 +55,7 @@ class ApiResponse
         ], 401);
     }
 
-    public static function forbidden($message = "Insufficient permissions")
+    public function forbidden($message = "Insufficient permissions") : JsonResponse
     {
         return response()->json([
             'status' => 'error',
@@ -57,7 +63,7 @@ class ApiResponse
         ], 403);
     }
 
-    public static function validationError($errors, $message = "Validation errors")
+    public function validationError($errors, $message = "Validation errors") : JsonResponse
     {
         return response()->json([
             'status' => 'error',
@@ -66,7 +72,7 @@ class ApiResponse
         ], 422);
     }
 
-    public static function deleted($message = "Resource deleted successfully.", $code = 204)
+    public function deleted($message = "Resource deleted successfully.", $code = 204) : JsonResponse
     {
         return response()->json([
             'status' => 'success',

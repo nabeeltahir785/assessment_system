@@ -6,7 +6,7 @@ use App\Http\Requests\CreateAssessmentRequest;
 use App\Models\Assessment;
 use App\Models\Question;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use ApiResponse;
 
 class AssessmentController extends Controller
 {
@@ -22,11 +22,9 @@ class AssessmentController extends Controller
             DB::transaction(function () use ($request) {
                 $this->createAssessment($request->validated());
             });
-
-            return response()->json(['message' => 'Assessment created successfully'], 201);
+            return ApiResponse::created(null,'Assessment created successfully',201);
         } catch (\Exception $e) {
-            dd($e);
-            return response()->json(['error' => 'Failed to create assessment'], 500);
+            return ApiResponse::error('Failed to create assessment',[],500);
         }
     }
     private function createAssessment(array $data)
@@ -60,15 +58,15 @@ class AssessmentController extends Controller
         $assessment = Assessment::find($id);
 
         if (!$assessment) {
-            return response()->json(['message' => 'Assessment not found'], 404);
+            return ApiResponse::error('Assessment not found',[],404);
         }
 
         $attemptCount = $assessment->attempt_count;
-
-        return response()->json([
+        return ApiResponse::success([
             'assessment_id' => $id,
             'attempt_count' => $attemptCount
         ]);
+
     }
 
 
@@ -85,6 +83,6 @@ class AssessmentController extends Controller
             ];
         }
 
-        return response()->json(['attempt_counts' => $attemptCounts]);
+        return ApiResponse::success($attemptCounts);
     }
 }

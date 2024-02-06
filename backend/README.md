@@ -33,6 +33,10 @@ Before you begin, ensure you have the following installed on your system:
 ```php artisan migrate```
 ```php artisan db:seed```
 
+### Drop all tables, migrate, and seed.
+
+```php artisan migrate:fresh --seed```
+
 ### Start the Laravel Server
 
 ```php artisan serve ```
