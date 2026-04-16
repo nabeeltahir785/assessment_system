@@ -1,31 +1,22 @@
 import React, { useState } from 'react';
 import Input from "@/components/Form/Input";
-
-interface Option {
-    option: string;
-    isCorrect: boolean;
-}
-
-interface Question {
-    id: number;
-    name: string;
-    type: 'MCQ' | 'MSQ';
-    options: Option[];
-    answer?: string | string[];
-}
+import { Button } from "@/components/Buttons";
+import { IQuestion } from "@/interfaces/models/IQuestion";
+import { IOption } from "@/interfaces/models/IOption";
+import { QuestionType } from "@/enums/QuestionType";
 
 interface QuestionsComponentProps {
-    addQuestion: (question: Question) => void;
+    addQuestion: (question: IQuestion) => void;
 }
 
 const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => {
     const [questionText, setQuestionText] = useState('');
-    const [questionType, setQuestionType] = useState<'MCQ' | 'MSQ'>('MCQ');
-    const [options, setOptions] = useState<Option[]>([
-        { option: '', isCorrect: false },
-        { option: '', isCorrect: false },
-        { option: '', isCorrect: false },
-        { option: '', isCorrect: false }
+    const [questionType, setQuestionType] = useState<QuestionType>(QuestionType.MCQ);
+    const [options, setOptions] = useState<IOption[]>([
+        { option: '', is_correct: false },
+        { option: '', is_correct: false },
+        { option: '', is_correct: false },
+        { option: '', is_correct: false }
     ]);
 
     const handleAddQuestion = () => {
@@ -34,8 +25,8 @@ const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => 
             return;
         }
 
-        const newQuestion: Question = {
-            id: Date.now(), // Unique ID, consider a more robust approach for production
+        const newQuestion: IQuestion = {
+            id: Date.now(), // Unique ID naturally generated
             name: questionText,
             type: questionType,
             options: options
@@ -43,17 +34,16 @@ const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => 
 
         addQuestion(newQuestion);
         setQuestionText('');
-        setQuestionType('MCQ');
+        setQuestionType(QuestionType.MCQ);
         setOptions([
-            { option: '', isCorrect: false },
-            { option: '', isCorrect: false },
-            { option: '', isCorrect: false },
-            { option: '', isCorrect: false }
+            { option: '', is_correct: false },
+            { option: '', is_correct: false },
+            { option: '', is_correct: false },
+            { option: '', is_correct: false }
         ]);
     };
 
-
-    const updateOption = (index: number, updatedOption: Option) => {
+    const updateOption = (index: number, updatedOption: IOption) => {
         const newOptions = options.map((option, i) => {
             if (i === index) {
                 return updatedOption;
@@ -62,22 +52,23 @@ const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => 
         });
         setOptions(newOptions);
     };
+
     const handleOptionSelectionForMCQ = (index: number) => {
         const newOptions = options.map((option, i) => {
-            return { ...option, isCorrect: i === index };
+            return { ...option, is_correct: i === index };
         });
         setOptions(newOptions);
     };
-
 
     return (
         <div>
             <Input type="text" value={questionText} onChange={(e) => setQuestionText(e.target.value)} placeholder="Question Text"/>
             <select className="form-select block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                    value={questionType} onChange={(e) => setQuestionType(e.target.value as 'MCQ' | 'MSQ')}>
-                <option value="MCQ">MCQ</option>
-                <option value="MSQ">MSQ</option>
+                    value={questionType} onChange={(e) => setQuestionType(e.target.value as QuestionType)}>
+                <option value={QuestionType.MCQ}>MCQ</option>
+                <option value={QuestionType.MSQ}>MSQ</option>
             </select>
+            
             {options.map((option, index) => (
                 <div key={index} className="my-2">
                     <Input  type="text"
@@ -85,24 +76,28 @@ const CreateQuestions: React.FC<QuestionsComponentProps> = ({ addQuestion }) => 
                             onChange={(e) => updateOption(index, { ...option, option: e.target.value })}
                             placeholder="Option Text"/>
 
-                    {questionType === 'MCQ' ? (
+                    {questionType === QuestionType.MCQ ? (
                         <input
                             type="radio"
                             name="mcqOption"
-                            checked={option.isCorrect}
+                            checked={option.is_correct}
                             onChange={() => handleOptionSelectionForMCQ(index)}
                         />
                     ) : (
                         <input
                             type="checkbox"
-                            checked={option.isCorrect}
-                            onChange={(e) => updateOption(index, { ...option, isCorrect: e.target.checked })}
+                            checked={option.is_correct}
+                            onChange={(e) => updateOption(index, { ...option, is_correct: e.target.checked })}
                         />
                     )}
                 </div>
             ))}
-            <button className="my-4 bg-rose text-white px-4 py-2 rounded hover:bg-[#ff2850] hover:shadow-lg transition duration-300"
-                onClick={handleAddQuestion}>Add Question</button>
+            
+            <div className="mt-4">
+               <Button onClick={handleAddQuestion} variant="secondary" type="button">
+                   Add Question
+               </Button>
+            </div>
         </div>
     );
 };
