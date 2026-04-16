@@ -2,7 +2,13 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -26,5 +32,47 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+
+
+        $this->renderable(function (ModelNotFoundException $e, Request $request) {
+            return $this->apiError(
+                'Resource not found',
+                404
+            );
+        });
+
+        $this->renderable(function (NotFoundHttpException $e, Request $request) {
+            return $this->apiError(
+                'The requested endpoint does not exist',
+                404
+            );
+        });
+
+        $this->renderable(function (ValidationException $e, Request $request) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Validation errors',
+                'errors'  => $e->errors(),
+            ], 422);
+        });
+
+        $this->renderable(function (AuthenticationException $e, Request $request) {
+            return $this->apiError(
+                'Unauthenticated — please provide a valid token',
+                401
+            );
+        });
+    }
+
+    /**
+     * DRY helper for error envelope construction.
+     */
+    private function apiError(string $message, int $code): JsonResponse
+    {
+        return response()->json([
+            'status'  => 'error',
+            'message' => $message,
+        ], $code);
     }
 }

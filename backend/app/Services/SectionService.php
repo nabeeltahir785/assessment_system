@@ -1,36 +1,34 @@
 <?php
 
-
 namespace App\Services;
 
-use App\Repositories\SectionRepository;
+use App\Contracts\Repositories\SectionRepositoryInterface;
+use App\Models\Section;
+use Illuminate\Database\Eloquent\Collection;
 
 class SectionService
 {
-    protected $sectionRepository;
+    public function __construct(
+        private readonly SectionRepositoryInterface $sectionRepository
+    ) {}
 
-    public function __construct(SectionRepository $sectionRepository)
-    {
-        $this->sectionRepository = $sectionRepository;
-    }
-
-    public function getAllSections()
+    public function getAllSections(): Collection
     {
         return $this->sectionRepository->getAll();
     }
 
-    public function createSection(array $data)
+    public function createSection(array $data): Section
     {
         return $this->sectionRepository->create($data);
     }
 
-    public function updateSection(Section $section, array $data)
+    public function updateSection(Section $section, array $data): Section
     {
         return $this->sectionRepository->update($section, $data);
     }
 
-    public function deleteSection(Section $section)
+    public function deleteSection(Section $section): bool
     {
-        $this->sectionRepository->delete($section);
+        return $this->sectionRepository->delete($section);
     }
 }

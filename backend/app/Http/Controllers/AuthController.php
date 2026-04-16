@@ -2,51 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
-use App\Services\ApiResponse;
+use App\Http\Requests\LoginRequest;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
+use ApiResponse;
+
 class AuthController extends Controller
 {
-    private $auth;
+    public function __construct(
+        private readonly AuthService $authService
+    ) {}
 
-    public function __construct(Guard $auth)
-    {
-        $this->auth = $auth;
-    }
-
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$this->auth->attempt($credentials)) {
-            return $this->invalidCredentialsResponse();
+        if (!auth()->attempt($credentials)) {
+            return ApiResponse::unauthorized('Invalid credentials');
         }
 
-        $user = $this->auth->user();
-        $tokenDetails = $this->createApiToken($user);
-//        $cookie = cookie('token', $tokenDetails['token'], 60);
+        $user = auth()->user();
+        $tokenDetails = $this->authService->createApiToken($user);
 
-//        return ApiResponse::loginSuccess($user, $tokenDetails['token'])->withCookie($cookie);
         return ApiResponse::loginSuccess($user, $tokenDetails['token']);
-
-    }
-
-    private function createApiToken($user)
-    {
-        $tokenResult = $user->createToken('API Access');
-        $expirationSeconds = $tokenResult->token->expires_at->diffInSeconds(Carbon::now());
-
-        return [
-            'token' => $tokenResult->accessToken,
-            'expiresIn' => $expirationSeconds,
-        ];
-    }
-
-
-
-    private function invalidCredentialsResponse()
-    {
-        return ApiResponse::unauthorized("Invalid Credentials");
     }
 }

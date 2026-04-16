@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 use ApiResponse;
 
 class CheckPermission
@@ -11,18 +13,22 @@ class CheckPermission
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $permission
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param  string|null  $permission  The required permission name
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next, ?string $permission = null): Response
     {
-        if ($request->route()->getPrefix() === 'api/admin' && Auth::user()->hasPermission('create_assessment') ) {
+        $user = Auth::user();
+
+        if (!$user) {
+            return ApiResponse::unauthorized();
+        }
+
+        // If no specific permission is required, allow any authenticated user through
+        if ($permission === null) {
             return $next($request);
         }
 
-        if ($request->route()->getPrefix() === 'api/student' && Auth::user()->hasPermission('attempt_assessment')) {
+        if ($user->hasPermission($permission)) {
             return $next($request);
         }
 

@@ -1,0 +1,10 @@
+# Root environment variables (contains secrets)
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

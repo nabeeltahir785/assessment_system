@@ -1,0 +1,166 @@
+# ============================================================================
+#  Assessment System — Docker Compose (Development)
+#  Start everything: make up
+# ============================================================================
+
+services:
+  # -----------------------------------------------------------------------
+  # MySQL 8.0
+  # -----------------------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: assessment_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_DATABASE:-assessment_db}
+      MYSQL_USER: ${DB_USERNAME:-assessment_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-assessment_pass}
+    ports:
+      - "${DB_PORT_FORWARD:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - assessment_network
+
+  # -----------------------------------------------------------------------
+  # Redis (caching / sessions / queues)
+  # -----------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: assessment_redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT_FORWARD:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - assessment_network
+
+  # -----------------------------------------------------------------------
+  # Laravel Backend (PHP 8.1)
+  # -----------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: assessment_backend
+    restart: unless-stopped
+    environment:
+      APP_NAME: "Assessment System"
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-assessment_db}
+      DB_USERNAME: ${DB_USERNAME:-assessment_user}
+      DB_PASSWORD: ${DB_PASSWORD:-assessment_pass}
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: "null"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - assessment_network
+
+  # -----------------------------------------------------------------------
+  # Next.js Frontend
+  # -----------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: assessment_frontend
+    restart: unless-stopped
+    environment:
+      BASE_URL: http://localhost:8000/api
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+      - frontend_next:/app/.next
+    depends_on:
+      - backend
+    networks:
+      - assessment_network
+
+  # -----------------------------------------------------------------------
+  # phpMyAdmin (optional DB GUI)
+  # -----------------------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: assessment_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8080:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - assessment_network
+
+  # -----------------------------------------------------------------------
+  # Mailpit (local email testing - catches all outgoing mail)
+  # -----------------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: assessment_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - assessment_network
+
+# =========================================================================
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_vendor:
+    driver: local
+  frontend_node_modules:
+    driver: local
+  frontend_next:
+    driver: local
+
+# =========================================================================
+networks:
+  assessment_network:
+    driver: bridge

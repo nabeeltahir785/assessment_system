@@ -2,19 +2,28 @@
 
 namespace App\Models;
 
+use App\Enums\QuestionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Question extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'section_id',
         'question_text',
         'options',
-        'type'
+        'type',
     ];
-    public function section()
+
+    protected $casts = [
+        'options' => 'array',
+        'type'    => QuestionType::class,
+    ];
+
+    public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class);
     }

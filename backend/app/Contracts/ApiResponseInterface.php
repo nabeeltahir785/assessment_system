@@ -2,21 +2,23 @@
 
 namespace App\Contracts;
 
+use Illuminate\Http\JsonResponse;
+
 interface ApiResponseInterface
 {
-    public function success($data = null, $message = "success", int $code = 200);
+    public function success(mixed $data = null, string $message = 'Success', int $code = 200): JsonResponse;
 
-    public function created($data = null, $message = "success", int $code = 201);
+    public function created(mixed $data = null, string $message = 'Created successfully', int $code = 201): JsonResponse;
 
-    public function error($message = "An error occurred", array $errors = [], int $code = 400);
+    public function error(string $message = 'An error occurred', array $errors = [], int $code = 400): JsonResponse;
 
-    public function loginSuccess($user, $token, $message = "Login successful");
+    public function unauthorized(string $message = 'Unauthorized access'): JsonResponse;
 
-    public function unauthorized($message = "Unauthorized access");
+    public function forbidden(string $message = 'Insufficient permissions'): JsonResponse;
 
-    public function forbidden($message = "Insufficient permissions");
+    public function validationError(mixed $errors = [], string $message = 'Validation errors'): JsonResponse;
 
-    public function validationError(array $errors, $message = "Validation errors");
+    public function deleted(string $message = 'Resource deleted successfully'): JsonResponse;
 
-    public function deleted($message = "Resource deleted successfully.", int $code = 204);
+    public function notFound(string $message = 'Resource not found'): JsonResponse;
 }

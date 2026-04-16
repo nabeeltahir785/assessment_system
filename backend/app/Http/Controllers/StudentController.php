@@ -2,24 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Assessment;
-use Illuminate\Http\Request;
+use App\Services\AssessmentService;
+use Illuminate\Http\JsonResponse;
+use ApiResponse;
 
 class StudentController extends Controller
 {
-    //
+    public function __construct(
+        private readonly AssessmentService $assessmentService
+    ) {}
 
-    public function getAllAssessments(){
-        return response()->json(['assessments' => Assessment::all()]);
+    /**
+     * List all available assessments for students.
+     */
+    public function getAllAssessments(): JsonResponse
+    {
+        $assessments = $this->assessmentService->getAllAssessments();
+
+        return ApiResponse::success($assessments, 'Assessments retrieved successfully.');
     }
 
-    public function findAssessment($id){
-        $assessment = Assessment::with('sections.questions')->find($id);
+    /**
+     * Retrieve a single assessment with its sections and questions.
+     */
+    public function findAssessment(int $id): JsonResponse
+    {
+        $assessment = $this->assessmentService->findWithDetails($id);
 
         if (!$assessment) {
-            return response()->json(['message' => 'Assessment not found'], 404);
+            return ApiResponse::notFound('Assessment not found');
         }
 
-        return response()->json(['assessment' => $assessment]);
+        return ApiResponse::success($assessment, 'Assessment retrieved successfully.');
     }
 }
