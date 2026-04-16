@@ -15,13 +15,17 @@ WORKDIR /app
 # ---------------------------------------------------------------------------
 FROM base AS deps
 
-COPY package.json package-lock.json* ./
-RUN npm ci
+RUN corepack enable pnpm
+
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
 
 # ---------------------------------------------------------------------------
 # Stage 3: Development target (default)
 # ---------------------------------------------------------------------------
 FROM base AS dev
+
+RUN corepack enable pnpm
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -30,12 +34,14 @@ EXPOSE 3000
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
 
 # ---------------------------------------------------------------------------
 # Stage 4: Production builder
 # ---------------------------------------------------------------------------
 FROM base AS builder
+
+RUN corepack enable pnpm
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -43,7 +49,7 @@ COPY . .
 ARG BASE_URL
 ENV BASE_URL=${BASE_URL}
 
-RUN npm run build
+RUN pnpm run build
 
 # ---------------------------------------------------------------------------
 # Stage 5: Production runner

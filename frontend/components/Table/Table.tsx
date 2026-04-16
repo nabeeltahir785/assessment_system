@@ -4,7 +4,7 @@ import TableBody from "@/components/Table/TableBody";
 
 interface TableProps {
     headers: string[];
-    data: { [key: string]: any }[];
+    data: Record<string, React.ReactNode>[];
 }
 
 const Table: React.FC<TableProps> = ({ headers, data }) => {

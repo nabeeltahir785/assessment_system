@@ -21,9 +21,9 @@ interface AssessmentTableProps {
 const AssessmentTable: React.FC<AssessmentTableProps> = ({ assessment }) => {
     const headers: string[] = ["ID", "Question", "Option 1", "Option 2", "Option 3", "Option 4", "Correct Answers"];
 
-    const transformedData: { [key: string]: any }[] = assessment.sections.reduce((acc, section) => {
+    const transformedData: Record<string, React.ReactNode>[] = assessment.sections.reduce((acc: Record<string, React.ReactNode>[], section) => {
         section.questions.forEach((question, index) => {
-            const rowData: { [key: string]: any } = {
+            const rowData: Record<string, React.ReactNode> = {
                 ID: question.id, // Use question ID instead of index
                 Question: question.name,
                 "Option 1": question.options[0]?.option,

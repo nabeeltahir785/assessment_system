@@ -2,7 +2,7 @@ import React from "react";
 
 interface TableProps {
     headers: string[];
-    data: { [key: string]: any }[];
+    data: Record<string, React.ReactNode>[];
 }
 const TableBody: React.FC<TableProps> = ({ headers, data }) => {
     return (

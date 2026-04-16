@@ -1,166 +1,39 @@
 "use client"
 import React, { createContext, useReducer, ReactNode, Dispatch  } from 'react';
-//TODO: Export these interfaces to their respective directories
-export interface Option {
-    option: string;
-    is_correct: boolean;
-}
 
-export interface Question {
-    id: number;
-    name: string;
-    type: 'MCQ' | 'MSQ';
-    options: Option[];
-    answer?: string | string[];
+// Domain Models
+import { IAssessment } from '@/interfaces/models/IAssessment';
+import { ISection } from '@/interfaces/models/ISection';
 
-}
-
-export interface Section {
-    id: number;
-    name?: string;
-    questions: Question[];
-}
-
-export interface AssessmentState {
-    title : string;
-    description?: string;
-    sections: Section[];
-}
+// Constants & Enums
+import { AssessmentMockData } from '@/constants/Mocks/AssessmentMock';
+import { AssessmentActionType } from '@/constants/AssessmentActions';
 
 type AssessmentContextProps = {
-    state: AssessmentState;
+    state: IAssessment;
     dispatch: Dispatch<AssessmentAction>;
 };
 
-const initialState: AssessmentState = {
-    title: '',
-    description: '',
-    sections: [
-        {
-            "id":1,
-            "questions":[
-                {
-                    "id":1,
-                    "name":"What is your age",
-                    "type":"MCQ",
-                    "options":[
-                        {
-                            "option":"20",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"22",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"23",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"24",
-                            "is_correct":true
-                        }
-                    ]
-                },
-                {
-                    "id":1,
-                    "name":"What is your name",
-                    "type":"MSQ",
-                    "options":[
-                        {
-                            "option":"20",
-                            "is_correct":true
-                        },
-                        {
-                            "option":"22",
-                            "is_correct":true
-                        },
-                        {
-                            "option":"23",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"24",
-                            "is_correct":true
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id":1,
-            "questions":[
-                {
-                    "id":2,
-                    "name":"Where are you",
-                    "type":"MCQ",
-                    "options":[
-                        {
-                            "option":"20",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"22",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"23",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"24",
-                            "is_correct":true
-                        }
-                    ]
-                },
-                {
-                    "id":1,
-                    "name":"Food Panda",
-                    "type":"MSQ",
-                    "options":[
-                        {
-                            "option":"20",
-                            "is_correct":true
-                        },
-                        {
-                            "option":"22",
-                            "is_correct":true
-                        },
-                        {
-                            "option":"23",
-                            "is_correct":false
-                        },
-                        {
-                            "option":"24",
-                            "is_correct":true
-                        }
-                    ]
-                }
-            ]
-        }
-    ],
-};
-
 type AssessmentAction =
-    | { type: 'ADD_SECTION'; payload: Section }
-    | { type: 'REMOVE_SECTION'; payload: { sectionId: number } }
-    | { type: 'UPDATE_ANSWER'; payload: { sectionId: number, questionId: number, answer: string | string[] } };
-// TODO: Split context providers into separate files Organize and split the context providers into individual files with each file representing a specific context or intent.
+    | { type: typeof AssessmentActionType.ADD_SECTION; payload: ISection }
+    | { type: typeof AssessmentActionType.REMOVE_SECTION; payload: { sectionId: number } }
+    | { type: typeof AssessmentActionType.UPDATE_ANSWER; payload: { sectionId: number, questionId: number, answer: string | string[] } };
+
 export const AssessmentContext = createContext<AssessmentContextProps | undefined>(undefined);
 
-const assessmentReducer = (state: AssessmentState, action: AssessmentAction): AssessmentState => {
+const assessmentReducer = (state: IAssessment, action: AssessmentAction): IAssessment => {
     switch (action.type) {
-        case 'ADD_SECTION':
+        case AssessmentActionType.ADD_SECTION:
             return {
                 ...state,
                 sections: [...state.sections, action.payload],
             };
-        case 'REMOVE_SECTION':
+        case AssessmentActionType.REMOVE_SECTION:
             return {
                 ...state,
                 sections: state.sections.filter(section => section.id !== action.payload.sectionId),
             };
-        case 'UPDATE_ANSWER':
+        case AssessmentActionType.UPDATE_ANSWER:
             const updatedSections = state.sections.map(section => {
                 if (section.id === action.payload.sectionId) {
                     return {
@@ -189,7 +62,8 @@ const assessmentReducer = (state: AssessmentState, action: AssessmentAction): As
 };
 
 export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [state, dispatch] = useReducer(assessmentReducer, initialState);
+    // Utilize Mock for now, but gracefully swapped inside standard production contexts
+    const [state, dispatch] = useReducer(assessmentReducer, AssessmentMockData);
 
     return (
         <AssessmentContext.Provider value={{ state, dispatch }}>
